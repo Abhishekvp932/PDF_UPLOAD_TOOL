@@ -1,76 +1,87 @@
-import { useState } from 'react'
-import { Button } from '../../components/ui/button'
-import { Input } from '../../components/ui/input'
-import { Label } from '../../components/ui/label'
-import { Card } from '../../components/ui/card'
-import api from '../../app/axiosInstance'
-import { toast,ToastContainer } from 'react-toastify';
-import { handleApiError } from '../../utils/handleApiError'
+import { useState } from "react";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import { Label } from "../../components/ui/label";
+import { Card } from "../../components/ui/card";
+import api from "../../app/axiosInstance";
+import { toast, ToastContainer } from "react-toastify";
+import { handleApiError } from "../../utils/handleApiError";
+import { Link, useNavigate } from "react-router-dom";
 export function SignupForm() {
-  const [email, setEmail] = useState<string>('')
-  const [password, setPassword] = useState<string>('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [errors, setErrors] = useState<Record<string, string>>({})
-  const [isLoading, setIsLoading] = useState(false)
-
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
   const validateEmail = (email: string) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-  }
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
 
-  const validate = ()=>{
-    const newErrors: Record<string, string> = {}
+  const validate = () => {
+    const newErrors: Record<string, string> = {};
     let isValidate = true;
     // Validation
     if (!email) {
-      newErrors.email = 'Email is required'
-      isValidate = false
+      newErrors.email = "Email is required";
+      isValidate = false;
     } else if (!validateEmail(email)) {
-      newErrors.email = 'Please enter a valid email'
-      isValidate = false
+      newErrors.email = "Please enter a valid email";
+      isValidate = false;
     }
 
     if (!password) {
-      newErrors.password = 'Password is required'
+      newErrors.password = "Password is required";
       isValidate = false;
     } else if (password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters'
+      newErrors.password = "Password must be at least 8 characters";
       isValidate = false;
     }
 
     if (!confirmPassword) {
-      newErrors.confirmPassword = 'Please confirm your password'
+      newErrors.confirmPassword = "Please confirm your password";
       isValidate = false;
     } else if (password !== confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match'
+      newErrors.confirmPassword = "Passwords do not match";
       isValidate = false;
     }
 
-    setErrors(newErrors)
+    setErrors(newErrors);
 
     return isValidate;
-
-
-  }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(false);
-    if(!validate()) return;
+    e.preventDefault();
+    setIsLoading(true);
+    if (!validate()) return;
 
     try {
-      const result = await api.post('/api/user/users',{
+      const result = await api.post("/api/user/singup", {
         email,
         password,
       });
+      console.log('result',result);
       toast.success(result?.data?.msg);
+      navigate('/')
     } catch (error) {
+      console.log(error);
       toast.error(handleApiError(error));
     }
-
-  }
+  };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center p-4" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', width: '100%', padding: '1rem' }}>
+    <div
+      className="min-h-screen w-full flex items-center justify-center p-4"
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: "100vh",
+        width: "100%",
+        padding: "1rem",
+      }}
+    >
       <Card className="w-full max-w-md p-8 shadow-lg">
         <div className="space-y-2 mb-8">
           <h1 className="text-3xl font-bold">Create Account</h1>
@@ -89,10 +100,10 @@ export function SignupForm() {
               placeholder="you@example.com"
               value={email}
               onChange={(e) => {
-                setEmail(e.target.value)
-                if (errors.email) setErrors({ ...errors, email: '' })
+                setEmail(e.target.value);
+                if (errors.email) setErrors({ ...errors, email: "" });
               }}
-              className={errors.email ? 'border-red-500' : ''}
+              className={errors.email ? "border-red-500" : ""}
               disabled={isLoading}
             />
             {errors.email && (
@@ -111,10 +122,10 @@ export function SignupForm() {
               placeholder="••••••••"
               value={password}
               onChange={(e) => {
-                setPassword(e.target.value)
-                if (errors.password) setErrors({ ...errors, password: '' })
+                setPassword(e.target.value);
+                if (errors.password) setErrors({ ...errors, password: "" });
               }}
-              className={errors.password ? 'border-red-500' : ''}
+              className={errors.password ? "border-red-500" : ""}
               disabled={isLoading}
             />
             {errors.password && (
@@ -133,10 +144,11 @@ export function SignupForm() {
               placeholder="••••••••"
               value={confirmPassword}
               onChange={(e) => {
-                setConfirmPassword(e.target.value)
-                if (errors.confirmPassword) setErrors({ ...errors, confirmPassword: '' })
+                setConfirmPassword(e.target.value);
+                if (errors.confirmPassword)
+                  setErrors({ ...errors, confirmPassword: "" });
               }}
-              className={errors.confirmPassword ? 'border-red-500' : ''}
+              className={errors.confirmPassword ? "border-red-500" : ""}
               disabled={isLoading}
             />
             {errors.confirmPassword && (
@@ -150,19 +162,18 @@ export function SignupForm() {
             className="w-full mt-8 font-semibold py-6"
             disabled={isLoading}
           >
-            {isLoading ? 'Creating account...' : 'Sign Up'}
+            {isLoading ? "Creating account..." : "Sign Up"}
           </Button>
         </div>
 
-        {/* Sign In Link */}
         <p className="text-center text-sm text-gray-600 mt-6">
-          Already have an account?{' '}
-          <a href="#" className="text-blue-600 font-medium hover:underline">
+          Already have an account?{" "}
+          <Link to="/" className="text-blue-600 font-medium hover:underline">
             Sign in
-          </a>
+          </Link>
         </p>
       </Card>
-      <ToastContainer autoClose={200}/>
+      <ToastContainer autoClose={200} />
     </div>
-  )
+  );
 }
