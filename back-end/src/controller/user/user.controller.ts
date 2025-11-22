@@ -21,15 +21,15 @@ export class UserController implements IUserController {
       const result = await this._userService.login(email, password);
       res.cookie("accessToken", result.accessToken, {
         httpOnly: true,
-        secure: false,
-        sameSite: "lax",
+        secure: true,
+        sameSite: "none",
         maxAge: 15 * 60 * 1000,
       });
 
       res.cookie("refreshToken", result.refreshToken, {
         httpOnly: true,
-        secure: false,
-        sameSite: "lax",
+        secure: true,
+        sameSite: "none",
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
       res.status(HttpStatus.OK).json(result);
