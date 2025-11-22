@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
@@ -7,13 +7,23 @@ import api from "../../app/axiosInstance";
 import { toast, ToastContainer } from "react-toastify";
 import { handleApiError } from "../../utils/handleApiError";
 import { Link, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../store/store";
 export function SignupForm() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
+  const user = useSelector((state:RootState)=> state.user.id);
   const navigate = useNavigate();
+
+  useEffect(()=>{
+    if(user){
+      navigate('/home');
+    }
+  },[user,navigate]);
+
   const validateEmail = (email: string) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };

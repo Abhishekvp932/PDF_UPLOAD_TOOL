@@ -4,6 +4,7 @@ export interface userType {
 }
 
 export interface UserPdf {
+        _id:string;
         userId?:string;
         fileName?:string;
         filePath?:string;

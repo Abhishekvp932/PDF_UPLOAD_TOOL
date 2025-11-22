@@ -9,9 +9,9 @@ import { handleApiError } from "../../utils/handleApiError";
 import api from "../../app/axiosInstance";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../store/store";
-
+import Header from "../../layout/Header"; 
+import { useNavigate } from "react-router-dom";
 pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
-
 const canvasFactory = {
   create: (width: number, height: number) => {
     const canvas = document.createElement("canvas");
@@ -55,6 +55,12 @@ export function HomePage() {
   const [totalPagesHistory, setTotalPagesHistory] = useState(1);
 
   const itemsPerPage = 3;
+  const navigate = useNavigate();
+   useEffect(()=>{
+    if(!userId){
+      navigate('/');
+    }
+  },[userId,navigate]);
 
   useEffect(() => {
     if (!pdfFile) return;
@@ -182,8 +188,31 @@ export function HomePage() {
     if (userId) fetchPdfHistory();
   }, [historyPage]);
 
+  const handlePdfDownload = async (pdfId:string,fileName:string)=>{
+   try {
+    const response = await api.get(`/api/user/download/${pdfId}`,{
+       responseType: "blob",
+    });
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", fileName);
+    document.body.appendChild(link);
+
+    link.click();
+    link.remove(); 
+
+    window.URL.revokeObjectURL(url);
+   } catch (error) {
+    toast.error(handleApiError(error));
+   }
+  }
+
   return (
-    <main className="min-h-screen bg-gray-100 p-10">
+    <main className="min-h-screen bg-gray-100 pt-24">
+     <Header/>
+
       <div className="max-w-7xl mx-auto">
         <h1 className="text-4xl font-bold mb-8">PDF Page Extractor</h1>
 
@@ -324,7 +353,9 @@ export function HomePage() {
                 </p>
               </div>
 
-              <button className="bg-green-600 text-white px-4 py-2 rounded flex items-center gap-2">
+              <button className="bg-green-600 text-white px-4 py-2 rounded flex items-center gap-2" 
+              onClick={()=> handlePdfDownload(item._id,item.fileName)}
+              >
                 <Download size={18} /> Download
               </button>
             </div>

@@ -86,6 +86,7 @@ export class UserService implements IUserService{
         ]);
          const userPdf:UserPdf[] = userPdfList.map((p)=>{
             return {
+                _id:p._id.toString(),
                 userId:p.userId.toString(),
                 fileName:p.fileName,
                 filePath:p.filePath,
@@ -96,4 +97,14 @@ export class UserService implements IUserService{
          })
         return {pdfHistory:userPdf,total};
     }
+    async downloadPdf(pdfId: string): Promise<{ filePath: string; fileName: string; }> {
+        const pdfRecord = await this._userPdfRepository.findById(pdfId);
+        if(!pdfRecord){
+         throw new Error('PDf not found'); 
+        }
+        return {
+            filePath:pdfRecord.filePath,
+            fileName:pdfRecord.fileName,
+        };
+    };
 }

@@ -21,4 +21,7 @@ export class UserPdfReposiory implements IUserPdfRepository {
     async countAll(userId: string): Promise<number> {
         return await UserPdf.countDocuments({userId});
     }
+    async findById(pdfId: string): Promise<IuserPdf | null> {
+        return await UserPdf.findById(pdfId);
+    }
 }

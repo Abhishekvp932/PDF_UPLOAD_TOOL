@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import {
@@ -13,8 +13,9 @@ import { toast, ToastContainer } from "react-toastify";
 import { handleApiError } from "../../utils/handleApiError";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../../app/axiosInstance";
-import { useDispatch} from "react-redux";
+import { useDispatch, useSelector} from "react-redux";
 import { setUser } from "../../features/userSlice";
+import type { RootState } from "../../store/store";
 
 interface ValidationErrors {
   email?: string;
@@ -26,8 +27,15 @@ export function LoginForm() {
   const [password, setPassword] = useState<string>("");
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [isLoading, setIsLoading] = useState(false);
+  const user = useSelector((state:RootState)=> state.user.id);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  useEffect(()=>{
+    if(user){
+      navigate('/home');
+    }
+  },[user,navigate]);
    const validateEmail = (email: string) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };

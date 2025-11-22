@@ -4,7 +4,7 @@ import { UserService } from '../service/user/user.service';
 import { UserRepository } from '../repository/user/user.repository';
 import { upload } from '../middleware/upload';
 import { UserPdfReposiory } from '../repository/userPdf/userPdf.repository';
-
+import { authMiddleware } from '../middleware/authMiddleware';
 const router = express.Router();
 const userRepository = new UserRepository();
 const userPdfRepository = new UserPdfReposiory();
@@ -19,9 +19,12 @@ router.route('/login')
 
 
 router.route('/extract/:userId')
-.post(upload.single('pdf'),userController.extractPdf.bind(userController));
+.post(authMiddleware,upload.single('pdf'),userController.extractPdf.bind(userController));
 
 
 router.route('/history/:userId')
-.get(userController.getHistory.bind(userController));
+.get(authMiddleware,userController.getHistory.bind(userController));
+
+router.route('/download/:pdfId')
+.get(authMiddleware,userController.downloadPdf.bind(userController));
 export default router;

@@ -96,4 +96,14 @@ export class UserController implements IUserController {
       next(error);
     }
   }
+  async downloadPdf(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      console.log('downloading request is comming',req.params);
+      const {pdfId} = req.params;
+      const result = await this._userService.downloadPdf(pdfId);
+      res.download(result.filePath,result.fileName);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
