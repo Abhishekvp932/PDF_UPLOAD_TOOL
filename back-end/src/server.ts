@@ -7,7 +7,7 @@ import { errorHandler } from "./middleware/errorHandlerMiddleware";
 const app: Application = express();
 
 const corsOperation = {
-  origin: "http://localhost:5173",
+  origin: "https://pdf-upload-tool.vercel.app",
   credentials: true ,
 };
 
