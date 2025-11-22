@@ -9,8 +9,10 @@ import { handleApiError } from "../../utils/handleApiError";
 import api from "../../app/axiosInstance";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../store/store";
-import Header from "../../layout/Header"; 
+import Header from "../../layout/Header";
 import { useNavigate } from "react-router-dom";
+import type { PDFDocumentProxy } from "pdfjs-dist";
+import type { RenderParamsWithFactory } from "../../utils/RenderParamsWithFactory ";
 pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
 const canvasFactory = {
   create: (width: number, height: number) => {
@@ -56,11 +58,11 @@ export function HomePage() {
 
   const itemsPerPage = 3;
   const navigate = useNavigate();
-   useEffect(()=>{
-    if(!userId){
-      navigate('/');
+  useEffect(() => {
+    if (!userId) {
+      navigate("/");
     }
-  },[userId,navigate]);
+  }, [userId, navigate]);
 
   useEffect(() => {
     if (!pdfFile) return;
@@ -83,7 +85,7 @@ export function HomePage() {
     loadPDF();
   }, [pdfFile]);
 
-  const renderAllPages = async (pdf) => {
+  const renderAllPages = async (pdf: PDFDocumentProxy) => {
     const images = new Map<number, string>();
 
     for (let i = 1; i <= pdf.numPages; i++) {
@@ -95,11 +97,14 @@ export function HomePage() {
         viewport.height
       );
 
-      await page.render({
+      const params: RenderParamsWithFactory = {
         viewport,
         canvasContext: context!,
         canvasFactory,
-      }).promise;
+        canvas,
+      };
+
+      await page.render(params).promise;
 
       images.set(i, canvas.toDataURL());
     }
@@ -188,30 +193,30 @@ export function HomePage() {
     if (userId) fetchPdfHistory();
   }, [historyPage]);
 
-  const handlePdfDownload = async (pdfId:string,fileName:string)=>{
-   try {
-    const response = await api.get(`/api/user/download/${pdfId}`,{
-       responseType: "blob",
-    });
-    const url = window.URL.createObjectURL(new Blob([response.data]));
+  const handlePdfDownload = async (pdfId: string, fileName: string) => {
+    try {
+      const response = await api.get(`/api/user/download/${pdfId}`, {
+        responseType: "blob",
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
 
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", fileName);
-    document.body.appendChild(link);
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", fileName);
+      document.body.appendChild(link);
 
-    link.click();
-    link.remove(); 
+      link.click();
+      link.remove();
 
-    window.URL.revokeObjectURL(url);
-   } catch (error) {
-    toast.error(handleApiError(error));
-   }
-  }
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      toast.error(handleApiError(error));
+    }
+  };
 
   return (
     <main className="min-h-screen bg-gray-100 pt-24">
-     <Header/>
+      <Header />
 
       <div className="max-w-7xl mx-auto">
         <h1 className="text-4xl font-bold mb-8">PDF Page Extractor</h1>
@@ -353,8 +358,9 @@ export function HomePage() {
                 </p>
               </div>
 
-              <button className="bg-green-600 text-white px-4 py-2 rounded flex items-center gap-2" 
-              onClick={()=> handlePdfDownload(item._id,item.fileName)}
+              <button
+                className="bg-green-600 text-white px-4 py-2 rounded flex items-center gap-2"
+                onClick={() => handlePdfDownload(item._id, item.fileName)}
               >
                 <Download size={18} /> Download
               </button>
