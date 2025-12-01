@@ -26,7 +26,6 @@ export function LoginForm() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [errors, setErrors] = useState<ValidationErrors>({});
-  const [isLoading, setIsLoading] = useState(false);
   const user = useSelector((state:RootState)=> state.user.id);
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -62,10 +61,8 @@ export function LoginForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     
     if (!validate()) {
-      setIsLoading(false);
       return;
     }
 
@@ -76,7 +73,6 @@ export function LoginForm() {
        });
 
        console.log('result',result);
-      setIsLoading(false);
       toast.success(result?.data?.msg)
       dispatch(setUser({id:result?.data?.user?.id,email:result.data?.user?.email}))
       navigate('/home');
@@ -148,10 +144,10 @@ export function LoginForm() {
             <Button
               type="button"
               onClick={handleSubmit}
-              disabled={!isFormValid || isLoading}
+              disabled={!isFormValid}
               className="w-full"
             >
-              {isLoading ? "Signing in..." : "Sign In"}
+              Sign In
             </Button>
 
             <p className="text-center text-sm text-gray-600 pt-2">

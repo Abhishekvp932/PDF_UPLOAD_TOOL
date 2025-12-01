@@ -14,7 +14,7 @@ export function SignupForm() {
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isLoading, setIsLoading] = useState(false);
+
   const user = useSelector((state:RootState)=> state.user.id);
   const navigate = useNavigate();
 
@@ -63,7 +63,6 @@ export function SignupForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     if (!validate()) return;
 
     try {
@@ -114,7 +113,7 @@ export function SignupForm() {
                 if (errors.email) setErrors({ ...errors, email: "" });
               }}
               className={errors.email ? "border-red-500" : ""}
-              disabled={isLoading}
+              
             />
             {errors.email && (
               <p className="text-sm text-red-600">{errors.email}</p>
@@ -136,7 +135,7 @@ export function SignupForm() {
                 if (errors.password) setErrors({ ...errors, password: "" });
               }}
               className={errors.password ? "border-red-500" : ""}
-              disabled={isLoading}
+              
             />
             {errors.password && (
               <p className="text-sm text-red-600">{errors.password}</p>
@@ -159,7 +158,7 @@ export function SignupForm() {
                   setErrors({ ...errors, confirmPassword: "" });
               }}
               className={errors.confirmPassword ? "border-red-500" : ""}
-              disabled={isLoading}
+             
             />
             {errors.confirmPassword && (
               <p className="text-sm text-red-600">{errors.confirmPassword}</p>
@@ -170,9 +169,9 @@ export function SignupForm() {
           <Button
             onClick={handleSubmit}
             className="w-full mt-8 font-semibold py-6"
-            disabled={isLoading}
+           
           >
-            {isLoading ? "Creating account..." : "Sign Up"}
+           Sign Up
           </Button>
         </div>
 
