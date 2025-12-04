@@ -12,10 +12,10 @@ import {
 import { toast, ToastContainer } from "react-toastify";
 import { handleApiError } from "../../utils/handleApiError";
 import { Link, useNavigate } from "react-router-dom";
-import api from "../../app/axiosInstance";
 import { useDispatch, useSelector} from "react-redux";
 import { setUser } from "../../features/userSlice";
 import type { RootState } from "../../store/store";
+import { Login } from "../../services/User";
 
 interface ValidationErrors {
   email?: string;
@@ -67,14 +67,10 @@ export function LoginForm() {
     }
 
     try {
-       const result = await api.post('/api/user/login',{
-        email,
-        password,
-       });
-
-       console.log('result',result);
-      toast.success(result?.data?.msg)
-      dispatch(setUser({id:result?.data?.user?.id,email:result.data?.user?.email}))
+      const data = await Login(email,password);
+       console.log('result',data);
+      toast.success(data?.msg)
+      dispatch(setUser({id:data?.user?.id,email:data.user?.email}))
       navigate('/home');
     } catch (error) {
         console.log(error);

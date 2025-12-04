@@ -2,6 +2,8 @@ import { NextFunction, Request, Response } from "express";
 import { HttpStatus } from "../utils/HttpStatus";
 import { generateAccessToken, verifyAccessToken, verifyRefreshToken } from "../utils/jwt";
 import { AuthRequest } from "../types/AuthRequest";
+import dontenv from 'dotenv';
+dontenv.config();
 
 export const authMiddleware = (req:AuthRequest,res:Response,next:NextFunction)=>{
    try {
@@ -40,7 +42,7 @@ export const authMiddleware = (req:AuthRequest,res:Response,next:NextFunction)=>
       httpOnly: true,
       secure: false,     
       sameSite: "lax",
-      maxAge: 15 * 60 * 1000,
+      maxAge:Number(process.env.ACCESS_TOKEN_EXPIRE_TIME),
     });
     req.user = decodeRefresh;
 

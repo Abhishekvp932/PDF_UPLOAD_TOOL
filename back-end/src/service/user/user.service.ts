@@ -8,7 +8,7 @@ import { generateAccessToken, generateRefreshToken, TokenPayload } from "../../u
 import { buffer } from "stream/consumers";
 import { Types } from "mongoose";
 import { UserPdf, UserPdfDTO, userType } from "../../types/userType";
-import { IuserPdf } from "../../models/interface/IuserPdf";
+
 
 export class UserService implements IUserService{
     constructor(private _userRepository:IUserRepository,

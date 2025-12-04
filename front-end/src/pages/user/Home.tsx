@@ -5,14 +5,14 @@ import { Upload, Check, ArrowUp, ArrowDown, Download } from "lucide-react";
 import * as pdfjsLib from "pdfjs-dist";
 import workerSrc from "pdfjs-dist/build/pdf.worker.min.mjs?url";
 import { toast } from "react-toastify";
-import { handleApiError } from "../../utils/handleApiError";
-import api from "../../app/axiosInstance";
+import { handleApiError } from "../../utils/handleApiError";  
 import { useSelector } from "react-redux";
 import type { RootState } from "../../store/store";
 import Header from "../../layout/Header";
 import { useNavigate } from "react-router-dom";
 import type { PDFDocumentProxy } from "pdfjs-dist";
 import type { RenderParamsWithFactory } from "../../utils/RenderParamsWithFactory ";
+import { downloadPdf, extractPdfPages, pdfHistory } from "../../services/User";
 pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
 const canvasFactory = {
   create: (width: number, height: number) => {
@@ -132,87 +132,83 @@ export function HomePage() {
     setSelectedPages(sorted);
   };
 
-  const handleCreatePdf = async () => {
-    if (!pdfFile) {
-      alert("Upload a PDF first");
-      return;
-    }
-    if (selectedPages.length === 0) {
-      alert("Select at least one page");
-      return;
-    }
+const handleCreatePdf = async () => {
+  if (!pdfFile) {
+    alert("Upload a PDF first");
+    return;
+  }
+  if (selectedPages.length === 0) {
+    alert("Select at least one page");
+    return;
+  }
 
-    const formData = new FormData();
-    formData.append("pdf", pdfFile);
-    formData.append("pages", JSON.stringify(selectedPages));
+  if (!userId) {
+  toast.error("User not found");
+  return;
+}
 
-    try {
-      const response = await api.post(
-        `/api/user/extract/${userId}?page=${historyPage}&limit=${itemsPerPage}`,
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-          responseType: "blob",
-        }
-      );
+  try {
+    const blob = await extractPdfPages(
+      userId,
+      historyPage,
+      itemsPerPage,
+      pdfFile,
+      selectedPages
+    );
 
-      const blob = response.data;
-      const url = URL.createObjectURL(blob);
+    const url = URL.createObjectURL(blob);
+    window.open(url, "_blank");
 
-      window.open(url, "_blank");
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "extracted.pdf";
+    a.click();
 
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "extracted.pdf";
-      a.click();
-
-      URL.revokeObjectURL(url);
-
-      fetchPdfHistory();
-    } catch (error) {
-      toast.error(handleApiError(error));
-    }
-  };
+    URL.revokeObjectURL(url);
+    fetchPdfHistory();
+  } catch (error) {
+    toast.error(handleApiError(error));
+  }
+};
 
   const fetchPdfHistory = async () => {
     try {
-      const response = await api.get(
-        `/api/user/history/${userId}?page=${historyPage}&limit=${itemsPerPage}`
-      );
-
-      console.log("History backend:", response.data);
-
-      setHistory(response.data.data);
-      setTotalPagesHistory(response.data.totalPages);
+      if(!userId){
+         toast.error("User not found");
+          return;
+      }
+     const result = await pdfHistory(userId,historyPage,itemsPerPage);
+      setHistory(result?.data);
+      setTotalPagesHistory(result.totalPages);
     } catch (error) {
       toast.error(handleApiError(error));
     }
   };
+  
 
   useEffect(() => {
     if (userId) fetchPdfHistory();
   }, [historyPage]);
 
-  const handlePdfDownload = async (pdfId: string, fileName: string) => {
-    try {
-      const response = await api.get(`/api/user/download/${pdfId}`, {
-        responseType: "blob",
-      });
-      const url = window.URL.createObjectURL(new Blob([response.data]));
+ const handlePdfDownload = async (pdfId: string, fileName: string) => {
+  try {
+    const blob = await downloadPdf(pdfId);
 
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", fileName);
-      document.body.appendChild(link);
+    const url = window.URL.createObjectURL(new Blob([blob]));
 
-      link.click();
-      link.remove();
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", fileName);
+    document.body.appendChild(link);
 
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      toast.error(handleApiError(error));
-    }
-  };
+    link.click();
+    link.remove();
+
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    toast.error(handleApiError(error));
+  }
+};
 
   return (
     <main className="min-h-screen bg-gray-100 pt-24">

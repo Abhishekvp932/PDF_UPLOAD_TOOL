@@ -3,7 +3,8 @@ import { IUserController } from "../../interface/user/IUserController";
 import { HttpStatus } from "../../utils/HttpStatus";
 import { IUserService } from "../../interface/user/IUserService";
 import { AuthRequest } from "../../types/AuthRequest";
-
+import dotenv from 'dotenv'
+dotenv.config();
 export class UserController implements IUserController {
   constructor(private _userService: IUserService) {}
   async signup(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -23,14 +24,14 @@ export class UserController implements IUserController {
         httpOnly: true,
         secure: true,
         sameSite: "none",
-        maxAge: 15 * 60 * 1000,
+        maxAge:Number(process.env.ACCESS_TOKEN_EXPIRE_TIME),
       });
 
       res.cookie("refreshToken", result.refreshToken, {
         httpOnly: true,
         secure: true,
         sameSite: "none",
-        maxAge: 7 * 24 * 60 * 60 * 1000,
+        maxAge:Number(process.env.REFRESH_TOKEN_EXPIRE_TIME),
       });
       res.status(HttpStatus.OK).json(result);
     } catch (error) {

@@ -10,6 +10,10 @@ const corsOperation = {
   origin: "https://pdf-upload-tool.vercel.app",
   credentials: true ,
 };
+// const corsOperation = {
+//   origin: "http://localhost:5173",
+//   credentials: true ,
+// };
 
 const PORT = 5000;
 app.use(cookieParser());

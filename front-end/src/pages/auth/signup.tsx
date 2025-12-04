@@ -3,12 +3,12 @@ import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { Card } from "../../components/ui/card";
-import api from "../../app/axiosInstance";
 import { toast, ToastContainer } from "react-toastify";
 import { handleApiError } from "../../utils/handleApiError";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../store/store";
+import { Signup } from "../../services/User";
 export function SignupForm() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -66,12 +66,9 @@ export function SignupForm() {
     if (!validate()) return;
 
     try {
-      const result = await api.post("/api/user/singup", {
-        email,
-        password,
-      });
-      console.log('result',result);
-      toast.success(result?.data?.msg);
+      const data = await Signup(email,password)
+      console.log('result',data);
+      toast.success(data?.msg);
       navigate('/')
     } catch (error) {
       console.log(error);
