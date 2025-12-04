@@ -37,12 +37,12 @@ export const authMiddleware = (req:AuthRequest,res:Response,next:NextFunction)=>
       id: decodeRefresh.id,
       email: decodeRefresh.email,
     });
-
+    const isProd = process.env.NODE_ENV === "production";
     res.cookie("accessToken", newAccessToken, {
       httpOnly: true,
-      secure: false,     
-      sameSite: "lax",
-      maxAge:Number(process.env.ACCESS_TOKEN_EXPIRE_TIME),
+      secure: isProd,     
+      sameSite: isProd ? "none" : "lax",
+      maxAge:Number(process.env.ACCESS_TOKEN_EXPIRE_TIME) * 1000,
     });
     req.user = decodeRefresh;
 

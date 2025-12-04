@@ -24,7 +24,7 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       toast.error("Session expired, please login again.");
       store.dispatch(clearUser());
-      window.location.href = "/login";
+      window.location.href = "/";
       return Promise.reject(error);
     }
 

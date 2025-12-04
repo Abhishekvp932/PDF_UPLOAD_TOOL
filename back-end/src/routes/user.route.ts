@@ -11,7 +11,7 @@ const userPdfRepository = new UserPdfReposiory();
 const userService = new UserService(userRepository,userPdfRepository);
 const userController = new UserController(userService);
 
-router.route('/singup')
+router.route('/signup')
 .post(userController.signup.bind(userController));
 
 router.route('/login')
