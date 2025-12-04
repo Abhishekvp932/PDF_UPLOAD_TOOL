@@ -41,7 +41,6 @@ export const authMiddleware = (req:AuthRequest,res:Response,next:NextFunction)=>
       httpOnly: true,
       secure: true,     
       sameSite:'none',
-      domain:process.env.FRONT_END_URL,
       maxAge:Number(process.env.ACCESS_TOKEN_EXPIRE_TIME) * 1000,
     });
     req.user = decodeRefresh;

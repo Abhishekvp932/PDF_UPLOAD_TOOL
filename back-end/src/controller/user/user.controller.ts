@@ -25,7 +25,6 @@ export class UserController implements IUserController {
         httpOnly: true,
         secure: true,
         sameSite:'none',
-        domain:process.env.FRONT_END_URL,
         maxAge:Number(process.env.ACCESS_TOKEN_EXPIRE_TIME) * 1000,
       });
        console.log("Cookie Set AccessToken Done");
@@ -33,7 +32,6 @@ export class UserController implements IUserController {
         httpOnly: true,
         secure: true,
         sameSite: 'none',
-        domain:process.env.FRONT_END_URL,
         maxAge:Number(process.env.REFRESH_TOKEN_EXPIRE_TIME) * 1000,
       });
       
